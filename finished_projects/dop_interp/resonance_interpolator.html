@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        
+        <title>
+            DopInterp
+        </title>
+
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+        <script src="idkhowtoreadacsv.js"></script>
+
+        <script>
+            function generateTableImage() {
+                var canvas = document.getElementById('imageCanvas');
+                var context = canvas.getContext("2d");
+                var img = document.getElementById('tableImage');
+                context.drawImage(img, 0, 0);
+            }
+            window.onload = generateTableImage;
+        </script>
+
+
+        <style>
+
+            #body {
+                display: grid;
+                grid-template-columns: 92.5%;
+                justify-content: center;
+            }
+
+            .container {
+                display: grid;
+                grid-template-columns: 75%;
+                justify-content: center;
+                background-color: #fff3e6;
+                border-top-style: hidden;
+                border-bottom-style: hidden;
+                border-left-style: solid;
+                border-right-style: solid;
+                border-color: #000000;
+
+            }
+
+            .zeroMargin {
+                margin-top: 15px;
+                margin-bottom: 13px;
+            }
+
+            #titleContainer {
+                text-align: center;
+                border-top-style: solid;
+            }
+
+            #bodyParagraphs {
+                display: grid;
+                grid-template-columns: 50%;
+                justify-content: center;
+                text-align: justify;
+            }
+
+            #userInterfaceContainer {
+                display: grid;
+                grid-template-columns: 25% 25%;
+                
+
+            }
+
+            #inputFieldContainer {
+                display: grid;
+                grid-template-columns: 75%;
+                justify-content: center;
+            }
+
+            #radioButtonContainer {
+                display: grid;
+                grid-template-columns: 50% 50%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .inputField {
+                display: grid;
+                grid-template-columns: auto;
+                justify-content: center;
+                text-align: center;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                
+            }
+
+            #userInputContainer {
+                border-style: solid hidden solid solid;
+            }
+
+            #RHSuserInterfaceContainer {
+                display: grid;
+                grid-template-rows: auto auto;
+                grid-template-columns: auto;
+                border-style: solid solid solid hidden;
+            }
+
+            #calculateButtonContainer {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+            }
+
+            #calculateButton {
+                scale: 1.4;
+                border-radius: 0;
+                cursor: pointer;
+            }
+
+            #resultContainer {
+                display: grid;
+                grid-template-columns: auto;
+                grid-template-rows: 25% 75%;
+            }
+
+            #result {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #canvasContainer {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            
+            #sourceContainer {
+                border-bottom: solid;
+            }
+
+        </style>
+    </head>
+
+    <body id="body">
+
+        <div id="theHiddenDiv" style="display: none">
+            <img src="resonance_table_image.png" id="tableImage">
+        </div>
+        
+        <div class="container" id="titleContainer">
+            <h1 class="zeroMargin">Resonance Parameter Interpolater</h1>
+            <h2 class="zeroMargin">Tuesday, 05/26/2026</h2>
+        </div>
+
+        <div class="container" id="bodyParagraphs">
+            <p>
+                The resonance integral <I>I</I> is involved in
+                calculating resonance escape probabilities and group cross sections
+                above thermal energies. To obtain <I>I</I>, you must know another value, <I>J</I>.
+                The parameter <I>J</I>.  To obtain <I>J</I>, you need the following
+                equations:
+            </p>
+
+            <!-- Equation  (8-75) in textbook-->
+            <p style="margin-top: 0px; margin-bottom: 0px;">
+                \[
+                J(\xi,\beta)\equiv\int_{0}^{\infty}
+                \frac{\Psi(\xi,x)}{\beta+\Psi(\xi,x)}
+                dx
+                \]
+            </p>
+
+            <!-- Equation for Psi curve in Doppler-broadened xs definition -->
+            <!-- Equation (2-95) in textbook -->
+            <p style="margin-top: 0px; margin-bottom: 10px;">
+                \[
+                \Psi(\xi,x)\equiv\frac{\xi}{2}\int_{\frac{-2E}{\Gamma}}^{\infty}
+                \frac{1}{1+y^2}
+                \left[
+                \exp{\left(-\frac{(\nu-\nu_{r})^2}{2\nu_{th}^2}\right)}-
+                \exp{\left(-\frac{(\nu+\nu_{r})^2}{2\nu_{th}^2}\right)}
+                \right]
+                dy
+                \]
+            </p>
+            
+            <p">
+                Real evaluations of this integral rely on numerical integration techniques.
+                The upside is that other people have already done the work of evaluating this
+                function over a spread of values for \(\xi\) and \(\beta\). If your problem
+                scenario's parameters for <I>J</I> don't allign with tabulated values, you will
+                need to perform billinear interpolation. Doing this interpolation is
+                tedious&mdash;especially if you are not provided a table of values in plaintext.
+            </p>
+
+            <p>
+                I've used this problem as an exercise  to learn how to make a simple program
+                in JavaScript. <q>DopInterp</q> lets you enter any \(\beta\)
+                or \(\xi\) value in the bounds of the resonance absorbtion table below [1]. If
+                you would like access to the numbers to make your own interpolator, feel free to
+                grab the arrays that they are stored in. They're hardcoded arrays in JavaScript
+                files because I couldn't figure out how to import csvs with JS.
+            </p>
+
+            <h2 style="text-align: center;">How to Use</h2>
+
+            <ol>
+                <li>
+                    Enter your values for \(\xi\) and <I>j</I>. To obtain j, you will need
+                    to use \(\beta=2^{j}\cdot10^{-5}\)
+                </li>
+                <li>
+                    Press <q>Calculate</q>
+                </li>
+            </ol>
+            
+            <p>
+                By default, <q>Draw Crosshair</q> is enabled. This
+                will treat the image of the table as a grid and draw intersecting lines that
+                represent where your <I>J</I> request would lie if it was on the table. It can
+                be disabled by selecting the <q>Disable</q> button before calculating.
+            </p>
+
+            <p>
+                If the calculation fails, the border around the input parameter box will turn
+                red. The <q>problematic</q> input will be highlighted in red.
+            </p>
+        </div>
+
+        <div class="container" id="userInterfaceContainer">
+
+            <div id="userInputContainer">
+
+                
+                <div id="radioButtonContainer">
+
+
+                    <div style="display: flex; justify-content: center;">
+                        Enable Crosshair
+                        <input type="radio" name="chSelect" id="crosshairOn" checked="checked">
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center;">
+                        Disable Crosshair
+                        <input type="radio" name="chSelect" id="crosshairOff">
+                    </div>
+
+                    
+                </div>
+
+                <div id="inputFieldContainer">
+
+                    <div class="inputField">
+                        <label for="xiField" id="xiLabel">Enter \(\xi_{req}\)</label>
+                        <input type="text" id="xiField">
+                    </div>
+
+                    <div class="inputField">
+                        <label for="jField" id="jLabel">Enter \(j_{req}\)</label>
+                        <input type="text" id="jField">
+                    </div>
+
+                    
+                </div>
+
+
+            </div>
+
+            <div id="RHSuserInterfaceContainer">
+
+                <div id="calculateButtonContainer">
+                    <button type="button" onclick="interpolateValues(document.getElementById('jField').value, document.getElementById('xiField').value)" id="calculateButton">
+                        Calculate
+                    </button>
+                </div>
+
+                <div id="resultContainer">
+
+                    <div style="display: flex; justify-content: center;">
+                        <h3 style="margin: 0px;">
+                            Result
+                        </h3>
+                    </div>
+
+                    <div id="result">
+                        
+                    </div>
+
+                </div>
+                
+            </div>
+
+        </div>
+
+        <div class="container" id="canvasContainer">
+
+            <canvas id="imageCanvas" width="1142" height="988">
+                Your browser doesnt support the canvas tag
+            </canvas>
+
+        </div>
+
+        
+
+        <div class="container" id="sourceContainer">
+            <I>[1]&emsp;J. J. Duderstadt and L. J. Hamilton, “Nuclear Reactor Analysis,” Table 8-3 </I>
+        </div>
+
+        <!-- Contains all the functions pertaining to drawing the crosshair and interpolating -->
+        <script>
+
+
+            // Function to clear crosshair and regenerate image on canvas
+            function clearCrosshair() {
+
+                // Clear canvas and re-add image
+                canvas = document.getElementById('imageCanvas');
+                context = canvas.getContext('2d');
+                img = document.getElementById('tableImage');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                generateTableImage();
+            }
+
+
+            // Function to recolor the border ring that encapsulates the user input
+            function recolorRing(color) {
+                document.getElementById('userInputContainer').style.borderColor = color;
+                document.getElementById('RHSuserInterfaceContainer').style.borderColor = color;   
+            }
+
+
+            // Function to billinearly interpolate input parameters 
+            function interpolateValues(j_req, xi_req) {
+
+                // Process and check values are valid, apply visuals as needed to alert user
+                j_req = parseFloat(j_req);
+                xi_req = parseFloat(xi_req);
+
+                // console.log(j_req);
+                // console.log(xi_req);
+                
+                if (isNaN(j_req)) {
+                    document.getElementById('jField').style.color = 'red';
+                    recolorRing('red');
+                    return;
+                }
+                else if (j_req<0 || j_req>31) {
+                    document.getElementById('jField').style.color = 'red';
+                    recolorRing('red');
+                    return;
+                }
+                else {
+                    document.getElementById('jField').style.color = 'black';
+                }
+
+
+                if (isNaN(xi_req)) {
+                    document.getElementById('xiField').style.color = 'red';
+                    recolorRing('red');
+                    return;
+                }
+                else if (xi_req<0.1 || xi_req>1) {
+                    document.getElementById('xiField').style.color = 'red';
+                    recolorRing('red');
+                    return;
+                }
+                else {
+                    document.getElementById('xiField').style.color = 'black';
+                }
+
+                recolorRing('black');
+
+
+                // Iterate through dataset (low to high) to find where the
+                // request lies relative to the set
+
+                // j
+                for (let i=0; i<32; i++) {
+                    
+                    // both integer and in-between check
+                    if (Math.abs(j_req-i)<1e-5) {
+                        var j_low = j_req;
+                        var j_upp = j_req;
+                        
+                        break;
+                    }
+                    else if ( j_req-i>0 && j_req-i< 1) {
+                        var j_low = i;
+                        var j_upp = i+1;
+                        break;
+                    }
+
+                }
+
+                // xi
+                for (let i=0; i<1.1; i=i+0.1) {
+
+                    // both integer and in-between check
+                    if (Math.abs(xi_req-i)<1e-5) {
+                        var xi_low = xi_req;
+                        var xi_upp = xi_req;
+                        break;
+                    }
+                    else if ( xi_req-i>0 && xi_req-i<0.1) {
+                        var xi_low = i;
+                        var xi_upp = i+0.1;
+                        break;
+                    }
+                }
+
+
+                // Obtain the fractional values of xi and j
+                j_frac = (j_req-j_low) / 1;
+                xi_frac = (xi_req-xi_low) / 0.1;
+
+                // console.log(j_frac);
+                // console.log(xi_frac);
+
+                // Fetch the necessary table values to continue
+                J_11 = DATA[j_low][Math.round(10*xi_low)-1];
+                J_12 = DATA[j_low][Math.round(10*xi_upp)-1];
+                J_21 = DATA[j_upp][Math.round(10*xi_low)-1];
+                J_22 = DATA[j_upp][Math.round(10*xi_upp)-1];
+
+
+                // Edge case to handle j values that lie exactly on grid
+                // if ( true == false && j_low == j_upp) {
+                //     Jj_low = J_11;
+                //     Jj_upp = J_12;
+                // }
+                // else {
+                //     Jj_low = j_frac*(J_21-J_11) + J_11;
+                //     Jj_upp = j_frac*(J_22-J_12) + J_12;
+                // }
+
+                // if ( true == false && xi_low == xi_upp) {
+                //     J_interp = J_11;
+                // }
+                // else {
+                //     J_interp = xi_frac*(Jj_upp-Jj_low) + Jj_low;
+                // }
+
+
+                Jj_low = j_frac*(J_21-J_11) + J_11;
+                Jj_upp = j_frac*(J_22-J_12) + J_12;
+                J_interp = xi_frac*(Jj_upp-Jj_low) + Jj_low;
+
+                // Draw crosshair if user requested it to be there
+                if (document.getElementById('crosshairOn').checked == true) {
+                    generateCrosshair(j_low, j_upp, j_frac, xi_low, xi_upp, xi_frac);
+                }
+                else {
+                    clearCrosshair();
+                }
+
+
+                // Put the value in the result div
+                document.getElementById('result').innerText = `${J_interp}`;
+            }
+
+
+            // Function to determine location of crosshair (if user wants it) and draw it
+            function generateCrosshair(j_low, j_upp, j_frac, xi_low, xi_upp, xi_frac) {
+
+                const canvas = document.getElementById('imageCanvas');
+                const context = canvas.getContext('2d');
+                clearCrosshair();
+                generateTableImage();
+
+                // Get x and y coordinates by interpolating
+                if (j_low == j_upp) {
+                    jLocation = yPixels[j_low];
+                }
+                else {
+                    jLocLow = yPixels[j_low];
+                    jLocUpp = yPixels[j_upp];
+                    jLocation = j_frac*(jLocUpp-jLocLow) + jLocLow;
+                }
+
+                if (xi_low == xi_upp) {
+                    xiLocation = xPixels[Math.round(10*xi_low)-1];
+                }
+                else {
+                    xiLocLow = xPixels[Math.round(10*xi_low)-1];
+                    xiLocUpp = xPixels[Math.round(10*xi_upp)-1];
+                    xiLocation = xi_frac*(xiLocUpp-xiLocLow) + xiLocLow;
+                }
+
+                // console.log(jLocation);
+                // console.log(xiLocation);
+
+                // Draw vertical line
+                context.beginPath();
+                context.moveTo(xiLocation, minY);
+                context.lineTo(xiLocation, maxY);
+                context.lineWidth = 3;
+                context.strokeStyle = 'red';
+                // context.setLineDash([20, 7, 5, 7]);
+                context.stroke();
+
+                // Horizontal line
+                context.beginPath();
+                context.moveTo(minX, jLocation);
+                context.lineTo(maxX, jLocation);
+                context.lineWidth = 3;
+                context.strokeStyle = 'red';
+                // context.setLineDash([20, 7, 5, 7]);
+                context.stroke();
+
+                // Circle on the point itself
+                context.beginPath();
+                context.arc(xiLocation, jLocation, 8, 0, 2*Math.PI);
+                context.fillStyle = 'red';
+                context.fill();
+                context.stroke();
+
+            }
+
+
+        </script>
+
+    </body>
+</html>

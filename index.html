@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        
+        <title>
+            Main Page
+        </title>
+
+        <style>
+
+            #temporary {
+                display: grid;
+                grid-template-columns: auto;
+                grid-template-rows: auto auto auto;
+                justify-content: center;
+            }
+
+            .mainDivs {
+                padding: 10px;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+        
+        <div class="mainDivs" id="temporary">
+
+            <div style="display: flex; justify-content: center;">
+                <h1>Robert's Webage</h1>
+            </div>
+            
+
+            <div class="mainDivs" id="linkHolder">
+                Finished (enough) projects:
+                <br>
+                <a href="/projects/dop_interp/resonance_interpolator.html"">
+                    Resonance Table Interpolator
+                </a>
+            </div>
+
+            <div class="mainDivs" id="toDo">
+                List of things todo:
+                <br>
+                <ul>
+                    <li>Full resonance integral calculator for NR+NRIM (JS)</li>
+                    <li>Fuel pin homogenizer (F)</li>
+                    <li>cli ENSDF to JSON (Python)</li>
+                    <li>MCNP run config in vscode (?)</li>
+                    <li>Comment syntax higlighter for T6 suite input files</li>
+
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
